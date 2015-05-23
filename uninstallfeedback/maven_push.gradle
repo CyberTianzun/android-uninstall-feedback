@@ -48,22 +48,27 @@ afterEvaluate { project ->
         }
     }
 
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
+    signing {
+        sign configurations.archives
     }
 
-    task sourcesJar(type: Jar) {
+    task androidJavadocs(type: Javadoc) {
+        source = android.sourceSets.main.java.sourceFiles
+    }
+
+    task androidJavadocsJar(type: Jar) {
+        classifier = 'javadoc'
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
         classifier = 'sources'
-        from sourceSets.main.allSource
+        from android.sourceSets.main.java.sourceFiles
     }
 
     artifacts {
-        archives javadocJar, sourcesJar
-    }
-
-    signing {
-        sign configurations.archives
+        archives androidSourcesJar
+        archives androidJavadocsJar
     }
 
 }

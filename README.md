@@ -27,7 +27,7 @@ You may add this line:
 
 ## Usage
 
-Add code to the initialization of app. For example, `OnCreate` method in Application or Activity. 
+Add the following code to the initialization of app. For example, `OnCreate` method in Application or Activity. 
 
 **Note:** Keep this code is only one. It will fork a thread. 
 

@@ -28,7 +28,18 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 		if (p_buf == NULL) {
 			exit(1);
 		}
-		size_t readBytes = read(fileDescriptor, p_buf, sizeof(struct inotify_event));
+		
+		int len = read(fileDescriptor, p_buf, sizeof(struct inotify_event));
+
+		if (len < 0) {
+			// if (errno == EINTR) {
+			//     need to reissue system call
+			// } else {
+			//     read error
+			// }
+			exit(1);
+		}
+
 		free(p_buf);
 		inotify_rm_watch(fileDescriptor, IN_DELETE);
 

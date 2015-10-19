@@ -4,8 +4,6 @@
 
 When your app is uninstalled, you can start a intent or a web browser.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.hiroz/uninstallfeedback-lib/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/cn.hiroz/uninstallfeedback-lib/)
-
 ## Installation
 
 Take from maven repository (<http://search.maven.org/#search%7Cga%7C1%7Ccn.hiroz>, <http://mvnrepository.com/search.html?query=cn.hiroz>) or add Coredroid and other components to your solution

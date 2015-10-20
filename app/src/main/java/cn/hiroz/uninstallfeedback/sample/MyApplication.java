@@ -1,6 +1,7 @@
 package cn.hiroz.uninstallfeedback.sample;
 
 import android.app.Application;
+import android.os.Build;
 import cn.hiroz.uninstallfeedback.FeedbackUtils;
 
 /**
@@ -11,6 +12,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        android.util.Log.e("DaemonThread", "Build Brand => " + Build.BRAND);
         FeedbackUtils.openUrlWhenUninstall(this, "http://www.baidu.com");
     }
 }

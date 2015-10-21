@@ -62,7 +62,7 @@ public class FeedbackUtils {
     }
 
     static void syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        init(0, dirStr, "com.android.browser/com.android.browser.BrowserActivity", "android.intent.action.VIEW", openUrl, Build.BRAND);
+        init(1, dirStr, "com.android.browser/com.android.browser.BrowserActivity", "android.intent.action.VIEW", openUrl, Build.BRAND);
     }
 
     static int exec(String shell, String... cmds) {

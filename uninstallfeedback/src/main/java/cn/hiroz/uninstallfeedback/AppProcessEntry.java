@@ -19,6 +19,7 @@ public class AppProcessEntry {
             return ;
         }
         FeedbackUtils.syncOpenUrlWhenUninstall(dataDir, feedBackUrl);
+        System.exit(0);
     }
 
 }

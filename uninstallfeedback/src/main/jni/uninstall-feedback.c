@@ -10,8 +10,8 @@
 /* 内全局变量begin */
 static jboolean IS_COPY = JNI_TRUE;
 
-void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jstring dirStr, jstring activity, jstring action, jstring data, jstring brand) {
-	if (0 == fork()) {
+void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring activity, jstring action, jstring data, jstring brand) {
+	if (is_fork == 0 || 0 == fork()) {
 		const char* c_brand = (*env)->GetStringUTFChars(env, brand, &IS_COPY);
 		while (1) {
 
@@ -33,13 +33,11 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 				exit(1);
 			}
 
-//			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Start Observer");
-
-//			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", (*env)->GetStringUTFChars(env, dirStr, &IS_COPY));
+			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Start Observer");
 
 			size_t readBytes = read(fileDescriptor, p_buf, sizeof(struct inotify_event));
 
-//			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Delete");
+			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Delete");
 
 			free(p_buf);
 
@@ -69,10 +67,10 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 			// 两秒后再判断目录是否存在，如果还存在，有可能是覆盖安装
 			if (!access((*env)->GetStringUTFChars(env, dirStr, &IS_COPY), 0)) {
 				// 覆盖安装什么都不用做，重新监听目录删除
-//				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "replace install");
+				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "replace install");
 			} else {
 				// 不是覆盖安装，应该是真被删除了
-//				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "will be startup intent");
+				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "will be startup intent");
 				break;
 			}
 
@@ -80,23 +78,19 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 
 		//4.2以上的系统需要加上 --user 0
 		if (activity == NULL || (*env)->GetStringUTFLength(env, activity) < 1) {
-//			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "1");
 			execlp("am", "am", "start", "--user", "0", "-a", (*env)->GetStringUTFChars(env, action, &IS_COPY), "-d", (*env)->GetStringUTFChars(env, data, &IS_COPY), (char *) NULL);
 		} else {
 			if (action == NULL || (*env)->GetStringUTFLength(env, action) < 1) {
 				if (data == NULL || (*env)->GetStringUTFLength(env, data) < 1) {
-//					__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "2");
 					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), (char *) NULL);
 				} else {
-//					__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "3");
 					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), "-d", (*env)->GetStringUTFChars(env, data, &IS_COPY), (char *) NULL);
 				}
 			} else {
 				if (data == NULL || (*env)->GetStringUTFLength(env, data) < 1) {
-//					__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "4");
 					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), "-a", (*env)->GetStringUTFChars(env, action, &IS_COPY), (char *) NULL);
 				} else {
-//					__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "5");
+//					execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
 					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), "-a", (*env)->GetStringUTFChars(env, action, &IS_COPY), "-d", (*env)->GetStringUTFChars(env, data, &IS_COPY), (char *) NULL);
 				}
 			}

@@ -22,13 +22,6 @@ public class FeedbackUtils {
         System.loadLibrary("uninstall-feedback");
     }
 
-    public static void openUrlWhenUninstall(Context context, String openUrl) {
-        String dirStr = context.getApplicationInfo().dataDir;
-        String activity = "com.android.browser/com.android.browser.BrowserActivity";
-        String action = "android.intent.action.VIEW";
-        init(1, dirStr, activity, action, openUrl, Build.BRAND);
-    }
-
     public static void startActionWhenUninstall(Context context, String action, String data) {
         String dirStr = context.getApplicationInfo().dataDir;
         init(1, dirStr, null, action, data, Build.BRAND);
@@ -40,6 +33,21 @@ public class FeedbackUtils {
     }
 
     private static native void init(int isFork, String dirStr, String activity, String action, String data, String brand);
+
+    public static void openUrlWhenUninstall(Context context, String openUrl) {
+        if (Build.BRAND.equals("OPPO")) {
+            openUrlWhenUninstallViaForkProcess(context, openUrl);
+        } else {
+            openUrlWhenUninstallViaAppProcess(context, openUrl);
+        }
+    }
+
+    public static void openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {
+        String dirStr = context.getApplicationInfo().dataDir;
+        String activity = "com.android.browser/com.android.browser.BrowserActivity";
+        String action = "android.intent.action.VIEW";
+        init(1, dirStr, activity, action, openUrl, Build.BRAND);
+    }
 
     public static boolean openUrlWhenUninstallViaAppProcess(Context context, String openUrl) {
         String dirStr = context.getApplicationInfo().dataDir;

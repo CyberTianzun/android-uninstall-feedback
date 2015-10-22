@@ -35,7 +35,7 @@ public class FeedbackUtils {
     private static native void init(int isFork, String dirStr, String activity, String action, String data, String brand);
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
-        if (Build.BRAND.equals("OPPO")) {
+        if (Build.BRAND.equals("OPPO") || Build.BRAND.equals("samsung")) {
             openUrlWhenUninstallViaForkProcess(context, openUrl);
         } else {
             openUrlWhenUninstallViaAppProcess(context, openUrl);

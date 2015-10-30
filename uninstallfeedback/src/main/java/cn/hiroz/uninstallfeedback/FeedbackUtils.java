@@ -19,17 +19,29 @@ public class FeedbackUtils {
     private static final String TAG = "FeedbackUtils";
 
     static {
-        System.loadLibrary("uninstall-feedback");
+        try {
+            System.loadLibrary("uninstall-feedback");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public static void startActionWhenUninstall(Context context, String action, String data) {
         String dirStr = context.getApplicationInfo().dataDir;
-        init(1, dirStr, null, action, data, Build.BRAND);
+        wrapInit(1, dirStr, null, action, data, Build.BRAND);
     }
 
     public static void startActivityWhenUninstall(Context context, String packageName, String activityName) {
         String dirStr = context.getApplicationInfo().dataDir;
-        init(1, dirStr, String.format("%s/%s", packageName, activityName), null, null, Build.BRAND);
+        wrapInit(1, dirStr, String.format("%s/%s", packageName, activityName), null, null, Build.BRAND);
+    }
+
+    private static void wrapInit(int isFork, String dirStr, String activity, String action, String data, String brand) {
+        try {
+            init(isFork, dirStr, activity, action, data, brand);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     private static native void init(int isFork, String dirStr, String activity, String action, String data, String brand);
@@ -46,7 +58,7 @@ public class FeedbackUtils {
         String dirStr = context.getApplicationInfo().dataDir;
         String activity = "com.android.browser/com.android.browser.BrowserActivity";
         String action = "android.intent.action.VIEW";
-        init(1, dirStr, activity, action, openUrl, Build.BRAND);
+        wrapInit(1, dirStr, activity, action, openUrl, Build.BRAND);
     }
 
     public static boolean openUrlWhenUninstallViaAppProcess(Context context, String openUrl) {
@@ -70,7 +82,7 @@ public class FeedbackUtils {
     }
 
     static void syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        init(1, dirStr, "com.android.browser/com.android.browser.BrowserActivity", "android.intent.action.VIEW", openUrl, Build.BRAND);
+        wrapInit(1, dirStr, "com.android.browser/com.android.browser.BrowserActivity", "android.intent.action.VIEW", openUrl, Build.BRAND);
     }
 
     static int exec(String shell, String... cmds) {

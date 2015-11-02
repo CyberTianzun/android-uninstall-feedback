@@ -17,16 +17,6 @@ public class MyApplication extends Application {
         super.onCreate();
         android.util.Log.e("DaemonThread", "Build Brand => " + Build.BRAND);
 //        FeedbackUtils.openUrlWhenUninstall(this, "http://www.baidu.com");
-        int a = FeedbackUtils.openUrlWhenUninstallViaForkProcess(this, "http://www.baidu.com");
-        android.util.Log.e("DaemonThread", "new thread => " + a);
-        try {
-            Thread.sleep(1000);
-            Runtime.getRuntime().exec("kill " + a);
-            //Runtime.getRuntime().exec("")
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FeedbackUtils.openUrlWhenUninstall(this, "http://www.baidu.com");
     }
 }

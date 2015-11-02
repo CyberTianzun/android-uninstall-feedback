@@ -101,12 +101,6 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 
 		}
 
-		__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "1");
-
-		execlp("sh", "echo", "started");
-
-		__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "2");
-
 		//4.2以上的系统需要加上 --user 0
 		if (activity == NULL || activity_length < 1) {
 			execlp("am", "am", "start", "--user", "0", "-a", action_chars, "-d", data_chars, (char *) NULL);

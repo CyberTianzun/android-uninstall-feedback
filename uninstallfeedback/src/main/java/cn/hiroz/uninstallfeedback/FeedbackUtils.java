@@ -53,6 +53,7 @@ public class FeedbackUtils {
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
         processId = openUrlWhenUninstallViaForkProcess(context, openUrl);
+        openUrlWhenUninstallViaAppProcess(context, openUrl);
     }
 
     public static int openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {

@@ -12,7 +12,31 @@ static jboolean IS_COPY = JNI_TRUE;
 
 void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring activity, jstring action, jstring data, jstring brand) {
 	if (is_fork == 0 || 0 == fork()) {
-		const char* c_brand = (*env)->GetStringUTFChars(env, brand, &IS_COPY);
+		const char* dir_chars = (*env)->GetStringUTFChars(env, dirStr, &IS_COPY);
+
+		const char* brand_chars = (*env)->GetStringUTFChars(env, brand, &IS_COPY);
+
+		const char* activity_chars;
+		int activity_length = 0;
+		if (activity != NULL) {
+			activity_length = (*env)->GetStringUTFLength(env, activity);
+			activity_chars = (*env)->GetStringUTFChars(env, activity, &IS_COPY);
+		}
+
+		const char* action_chars;
+		int action_length = 0;
+		if (action != NULL) {
+			action_length = (*env)->GetStringUTFLength(env, action);
+			action_chars = (*env)->GetStringUTFChars(env, action, &IS_COPY);
+		}
+
+		const char* data_chars;
+		int data_length = 0;
+		if (data != NULL) {
+			data_length = (*env)->GetStringUTFLength(env, data);
+			data_chars = (*env)->GetStringUTFChars(env, data, &IS_COPY);
+		}
+
 		while (1) {
 
 			int fileDescriptor = inotify_init();
@@ -22,7 +46,7 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 			}
 
 			int watchDescriptor;
-			watchDescriptor = inotify_add_watch(fileDescriptor, (*env)->GetStringUTFChars(env, dirStr, &IS_COPY), IN_DELETE);
+			watchDescriptor = inotify_add_watch(fileDescriptor, dir_chars, IN_DELETE);
 			if (watchDescriptor < 0) {
 				//inotify_add_watch failed
 				exit(1);
@@ -58,14 +82,14 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 //				}
 //			}
 
-			if (strcmp(c_brand, "Huawei") == 0) {
+			if (strcmp(brand_chars, "Huawei") == 0) {
 				break;
 			} else {
-				sleep(2);
+				sleep(1);
 			}
 
 			// 两秒后再判断目录是否存在，如果还存在，有可能是覆盖安装
-			if (!access((*env)->GetStringUTFChars(env, dirStr, &IS_COPY), 0)) {
+			if (!access(dir_chars, 0)) {
 				// 覆盖安装什么都不用做，重新监听目录删除
 				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "replace install");
 			} else {
@@ -76,22 +100,28 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 
 		}
 
+		__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "1");
+
+		execlp("sh", "echo", "started");
+
+		__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "2");
+
 		//4.2以上的系统需要加上 --user 0
-		if (activity == NULL || (*env)->GetStringUTFLength(env, activity) < 1) {
-			execlp("am", "am", "start", "--user", "0", "-a", (*env)->GetStringUTFChars(env, action, &IS_COPY), "-d", (*env)->GetStringUTFChars(env, data, &IS_COPY), (char *) NULL);
+		if (activity == NULL || activity_length < 1) {
+			execlp("am", "am", "start", "--user", "0", "-a", action_chars, "-d", data_chars, (char *) NULL);
 		} else {
-			if (action == NULL || (*env)->GetStringUTFLength(env, action) < 1) {
-				if (data == NULL || (*env)->GetStringUTFLength(env, data) < 1) {
-					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), (char *) NULL);
+			if (action == NULL || action_length < 1) {
+				if (data == NULL || data_length < 1) {
+					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, (char *) NULL);
 				} else {
-					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), "-d", (*env)->GetStringUTFChars(env, data, &IS_COPY), (char *) NULL);
+					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, "-d", action_chars, (char *) NULL);
 				}
 			} else {
-				if (data == NULL || (*env)->GetStringUTFLength(env, data) < 1) {
-					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), "-a", (*env)->GetStringUTFChars(env, action, &IS_COPY), (char *) NULL);
+				if (data == NULL || data_length < 1) {
+					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, "-a", action_chars, (char *) NULL);
 				} else {
 //					execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
-					execlp("am", "am", "start", "--user", "0", "-n", (*env)->GetStringUTFChars(env, activity, &IS_COPY), "-a", (*env)->GetStringUTFChars(env, action, &IS_COPY), "-d", (*env)->GetStringUTFChars(env, data, &IS_COPY), (char *) NULL);
+					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, "-a", action_chars, "-d", data_chars, (char *) NULL);
 				}
 			}
 		}

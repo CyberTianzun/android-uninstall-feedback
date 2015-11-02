@@ -47,18 +47,12 @@ public class FeedbackUtils {
     private static native void init(int isFork, String dirStr, String activity, String action, String data, String brand);
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
-        if (Build.BRAND.equals("OPPO") || Build.BRAND.equals("samsung")) {
-            openUrlWhenUninstallViaForkProcess(context, openUrl);
-        } else {
-            openUrlWhenUninstallViaAppProcess(context, openUrl);
-        }
+        openUrlWhenUninstallViaForkProcess(context, openUrl);
+        openUrlWhenUninstallViaAppProcess(context, openUrl);
     }
 
     public static void openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {
-        String dirStr = context.getApplicationInfo().dataDir;
-        String activity = "com.android.browser/com.android.browser.BrowserActivity";
-        String action = "android.intent.action.VIEW";
-        wrapInit(1, dirStr, activity, action, openUrl, Build.BRAND);
+        asyncOpenUrlWhenUninstall(context.getApplicationInfo().dataDir, openUrl);
     }
 
     public static boolean openUrlWhenUninstallViaAppProcess(Context context, String openUrl) {
@@ -82,7 +76,11 @@ public class FeedbackUtils {
     }
 
     static void syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        wrapInit(1, dirStr, "com.android.browser/com.android.browser.BrowserActivity", "android.intent.action.VIEW", openUrl, Build.BRAND);
+        wrapInit(0, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
+    }
+
+    static void asyncOpenUrlWhenUninstall(String dirStr, String openUrl) {
+        wrapInit(1, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
     }
 
     static int exec(String shell, String... cmds) {
@@ -104,7 +102,7 @@ public class FeedbackUtils {
         }
     }
 
-    private static String getDexpath(Context context) {
+    static String getDexpath(Context context) {
         StringBuilder dexPath = new StringBuilder();
         boolean IS_VM_MULTIDEX_CAPABLE;
         ApplicationInfo applicationInfo = context.getApplicationInfo();

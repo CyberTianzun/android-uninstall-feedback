@@ -7,6 +7,7 @@ import android.util.AndroidRuntimeException;
 import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
 public class FeedbackUtils {
 
     private static final String TAG = "FeedbackUtils";
+    private static int processId = 0;
 
     static {
         try {
@@ -26,33 +28,35 @@ public class FeedbackUtils {
         }
     }
 
-    public static void startActionWhenUninstall(Context context, String action, String data) {
-        String dirStr = context.getApplicationInfo().dataDir;
-        wrapInit(1, dirStr, null, action, data, Build.BRAND);
+    public static boolean cancel() {
+        if (processId > 0) {
+            try {
+                Runtime.getRuntime().exec("kill " + processId);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
-    public static void startActivityWhenUninstall(Context context, String packageName, String activityName) {
-        String dirStr = context.getApplicationInfo().dataDir;
-        wrapInit(1, dirStr, String.format("%s/%s", packageName, activityName), null, null, Build.BRAND);
-    }
-
-    private static void wrapInit(int isFork, String dirStr, String activity, String action, String data, String brand) {
+    private static int wrapInit(int isFork, String dirStr, String activity, String action, String data, String brand) {
         try {
-            init(isFork, dirStr, activity, action, data, brand);
+            return init(isFork, dirStr, activity, action, data, brand);
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        return 0;
     }
 
-    private static native void init(int isFork, String dirStr, String activity, String action, String data, String brand);
+    private static native int init(int isFork, String dirStr, String activity, String action, String data, String brand);
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
-        openUrlWhenUninstallViaForkProcess(context, openUrl);
-        openUrlWhenUninstallViaAppProcess(context, openUrl);
+        processId = openUrlWhenUninstallViaForkProcess(context, openUrl);
     }
 
-    public static void openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {
-        asyncOpenUrlWhenUninstall(context.getApplicationInfo().dataDir, openUrl);
+    public static int openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {
+        return asyncOpenUrlWhenUninstall(context.getApplicationInfo().dataDir, openUrl);
     }
 
     public static boolean openUrlWhenUninstallViaAppProcess(Context context, String openUrl) {
@@ -75,12 +79,12 @@ public class FeedbackUtils {
         return true;
     }
 
-    static void syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        wrapInit(0, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
+    static int syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
+        return wrapInit(0, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
     }
 
-    static void asyncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        wrapInit(1, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
+    static int asyncOpenUrlWhenUninstall(String dirStr, String openUrl) {
+        return wrapInit(1, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
     }
 
     static int exec(String shell, String... cmds) {

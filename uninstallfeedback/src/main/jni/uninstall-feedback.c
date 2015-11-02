@@ -10,8 +10,9 @@
 /* 内全局变量begin */
 static jboolean IS_COPY = JNI_TRUE;
 
-void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring activity, jstring action, jstring data, jstring brand) {
-	if (is_fork == 0 || 0 == fork()) {
+jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring activity, jstring action, jstring data, jstring brand) {
+	int forkProcess = 0;
+	if (is_fork == 0 || 0 == (forkProcess = fork())) {
 		const char* dir_chars = (*env)->GetStringUTFChars(env, dirStr, &IS_COPY);
 
 		const char* brand_chars = (*env)->GetStringUTFChars(env, brand, &IS_COPY);
@@ -126,4 +127,5 @@ void Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 			}
 		}
 	}
+	return forkProcess;
 }

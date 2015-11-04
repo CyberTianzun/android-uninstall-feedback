@@ -19,6 +19,7 @@ public class FeedbackUtils {
 
     private static final String TAG = "FeedbackUtils";
     private static int processId = 0;
+    private static Context context;
 
     static {
         try {
@@ -32,6 +33,7 @@ public class FeedbackUtils {
         if (processId > 0) {
             try {
                 Runtime.getRuntime().exec("kill " + processId);
+                Runtime.getRuntime().exec("killall '" + context.getPackageName() + ":feedback'");
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -52,6 +54,7 @@ public class FeedbackUtils {
     private static native int init(int isFork, String dirStr, String activity, String action, String data, String brand);
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
+        FeedbackUtils.context = context;
         processId = openUrlWhenUninstallViaForkProcess(context, openUrl);
         openUrlWhenUninstallViaAppProcess(context, openUrl);
     }
@@ -70,6 +73,7 @@ public class FeedbackUtils {
                     String.format("export %s=%s", "FEEDBACK_URL", "'" + openUrl + "'"),
                     String.format("export %s=%s", "PATH", System.getenv("PATH")),
                     String.format("export %s=%s", "DATA_DIR", dirStr),
+                    String.format("export %s=%s", "PACKAGE_NAME", context.getPackageName()),
                     String.format("export %s=%s", "LD_LIBRARY_PATH", System.getenv("LD_LIBRARY_PATH") + ":" + dirStr + "/lib"),
                     String.format("app_process / %s --nice-name=%s --daemon &", AppProcessEntry.class.getName(), context.getPackageName())
             );

@@ -11,7 +11,10 @@ import java.lang.reflect.Method;
 public class AppProcessEntry {
 
     public static void main(String[] args) {
-        final String dataDir = System.getenv("DATA_DIR"), feedBackUrl = System.getenv("FEEDBACK_URL");
+        final String dataDir = System.getenv("DATA_DIR"),
+                     feedBackUrl = System.getenv("FEEDBACK_URL"),
+                     packageName = System.getenv("PACKAGE_NAME");
+        setProcessName(packageName + ":feedback");
         if (TextUtils.isEmpty(dataDir)) {
             Log.e("DaemonThread", "DATA_DIR is empty, DaemonThread exit.");
             return;
@@ -26,6 +29,16 @@ public class AppProcessEntry {
                 FeedbackUtils.syncOpenUrlWhenUninstall(dataDir, feedBackUrl);
             }
         }).start();
+    }
+
+    private static void setProcessName(String name) {
+        try {
+            Class<android.os.Process> clazz = android.os.Process.class;
+            Method method = clazz.getMethod("setArgV0", String.class);
+            method.invoke(null, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

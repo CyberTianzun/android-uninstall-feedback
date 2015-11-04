@@ -84,7 +84,11 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 //			}
 
 			if (strcmp(brand_chars, "Huawei") == 0) {
-				break;
+				// 做一个延时操作
+				int i = 0;
+				for (i = 0; i < 1000; i++) {
+					__android_log_write(ANDROID_LOG_DEBUG, "init", "tic-toc");
+				}
 			} else {
 				sleep(1);
 			}

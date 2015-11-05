@@ -105,7 +105,7 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 
 		//4.1以上的系统需要加上 --user 0
 		//区分Android 4.x之前的版本 和 Android 4.x之后的版本的API变化
-		if (api_level > 16) {
+		if (api_level >= 16) {
 			execlp("am", "am", "start", "--user", "0", "-a", "android.intent.action.VIEW", "-d", data_chars, (char *) NULL);
 		} else {
 			execlp("am", "am", "start", "-a", "android.intent.action.VIEW", "-d", data_chars, (char *) NULL);

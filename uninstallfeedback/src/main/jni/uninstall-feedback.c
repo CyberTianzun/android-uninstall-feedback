@@ -24,8 +24,10 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 //			data_chars = (*env)->GetStringUTFChars(env, data, &IS_COPY);
 //		}
 
-		char data_chars[512];
-		sprintf(data_chars, "%s", (*env)->GetStringUTFChars(env, data, &IS_COPY));
+		const char* data_chars = (*env)->GetStringUTFChars(env, data, &IS_COPY);
+
+//		char data_chars[512];
+//		sprintf(data_chars, "%s", (*env)->GetStringUTFChars(env, data, &IS_COPY));
 
 		while (1) {
 
@@ -94,9 +96,7 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 
 		}
 
-//		execlp("am", "am", "start", "-a", "android.intent.action.VIEW", "-d", data_chars, (char *)NULL);
-//		execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
-
+//		execlp("am", "am", "start", "-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
 //		execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
 
 //		char ver[20];

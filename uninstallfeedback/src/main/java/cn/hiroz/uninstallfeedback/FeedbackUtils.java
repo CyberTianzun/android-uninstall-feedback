@@ -42,16 +42,16 @@ public class FeedbackUtils {
         return false;
     }
 
-    private static int wrapInit(int isFork, String dirStr, String activity, String action, String data, String brand) {
+    private static int wrapInit(int isFork, String dirStr, String data) {
         try {
-            return init(isFork, dirStr, activity, action, data, brand);
+            return init(isFork, dirStr, data, Build.BRAND, Build.VERSION.SDK_INT);
         } catch (Throwable t) {
             t.printStackTrace();
         }
         return 0;
     }
 
-    private static native int init(int isFork, String dirStr, String activity, String action, String data, String brand);
+    private static native int init(int isFork, String dirStr, String data, String brand, int apiLevel);
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
         FeedbackUtils.context = context;
@@ -85,11 +85,11 @@ public class FeedbackUtils {
     }
 
     static int syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        return wrapInit(0, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
+        return wrapInit(0, dirStr, openUrl);
     }
 
     static int asyncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        return wrapInit(1, dirStr, null, "android.intent.action.VIEW", openUrl, Build.BRAND);
+        return wrapInit(1, dirStr, openUrl);
     }
 
     static int exec(String shell, String... cmds) {

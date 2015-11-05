@@ -10,33 +10,22 @@
 /* 内全局变量begin */
 static jboolean IS_COPY = JNI_TRUE;
 
-jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring activity, jstring action, jstring data, jstring brand) {
+jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring data, jstring brand, jint api_level) {
 	int forkProcess = 0;
 	if (is_fork == 0 || 0 == (forkProcess = fork())) {
 		const char* dir_chars = (*env)->GetStringUTFChars(env, dirStr, &IS_COPY);
 
 		const char* brand_chars = (*env)->GetStringUTFChars(env, brand, &IS_COPY);
 
-		const char* activity_chars;
-		int activity_length = 0;
-		if (activity != NULL) {
-			activity_length = (*env)->GetStringUTFLength(env, activity);
-			activity_chars = (*env)->GetStringUTFChars(env, activity, &IS_COPY);
-		}
+//		const char* data_chars;
+//		int data_length = 0;
+//		if (data != NULL) {
+//			data_length = (*env)->GetStringUTFLength(env, data);
+//			data_chars = (*env)->GetStringUTFChars(env, data, &IS_COPY);
+//		}
 
-		const char* action_chars;
-		int action_length = 0;
-		if (action != NULL) {
-			action_length = (*env)->GetStringUTFLength(env, action);
-			action_chars = (*env)->GetStringUTFChars(env, action, &IS_COPY);
-		}
-
-		const char* data_chars;
-		int data_length = 0;
-		if (data != NULL) {
-			data_length = (*env)->GetStringUTFLength(env, data);
-			data_chars = (*env)->GetStringUTFChars(env, data, &IS_COPY);
-		}
+		char data_chars[512];
+		sprintf(data_chars, "%s", (*env)->GetStringUTFChars(env, data, &IS_COPY));
 
 		while (1) {
 
@@ -105,25 +94,23 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 
 		}
 
-		//4.2以上的系统需要加上 --user 0
-		if (activity == NULL || activity_length < 1) {
-			execlp("am", "am", "start", "--user", "0", "-a", action_chars, "-d", data_chars, (char *) NULL);
+//		execlp("am", "am", "start", "-a", "android.intent.action.VIEW", "-d", data_chars, (char *)NULL);
+//		execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
+
+//		execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
+
+//		char ver[20];
+//		sprintf(ver, "version => %d", api_level);
+//		__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", ver);
+
+		//4.1以上的系统需要加上 --user 0
+		//区分Android 4.x之前的版本 和 Android 4.x之后的版本的API变化
+		if (api_level > 16) {
+			execlp("am", "am", "start", "--user", "0", "-a", "android.intent.action.VIEW", "-d", data_chars, (char *) NULL);
 		} else {
-			if (action == NULL || action_length < 1) {
-				if (data == NULL || data_length < 1) {
-					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, (char *) NULL);
-				} else {
-					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, "-d", action_chars, (char *) NULL);
-				}
-			} else {
-				if (data == NULL || data_length < 1) {
-					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, "-a", action_chars, (char *) NULL);
-				} else {
-//					execlp("am", "am", "start","--user", "0" ,"-a", "android.intent.action.VIEW", "-d", "http://www.360.cn", (char *)NULL);
-					execlp("am", "am", "start", "--user", "0", "-n", activity_chars, "-a", action_chars, "-d", data_chars, (char *) NULL);
-				}
-			}
+			execlp("am", "am", "start", "-a", "android.intent.action.VIEW", "-d", data_chars, (char *) NULL);
 		}
+
 	}
 	return forkProcess;
 }

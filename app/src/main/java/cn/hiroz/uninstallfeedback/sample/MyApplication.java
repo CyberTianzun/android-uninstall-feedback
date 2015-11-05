@@ -15,19 +15,9 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
         android.util.Log.e("DaemonThread", "Build Brand => " + Build.BRAND);
-//        FeedbackUtils.openUrlWhenUninstall(this, "http://www.baidu.com");
+
         FeedbackUtils.openUrlWhenUninstall(this, "http://www.baidu.com");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    FeedbackUtils.cancel();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 }

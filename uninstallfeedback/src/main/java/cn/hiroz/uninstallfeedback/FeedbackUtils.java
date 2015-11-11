@@ -25,18 +25,22 @@ public class FeedbackUtils {
         try {
             System.loadLibrary("uninstall-feedback");
         } catch (Throwable e) {
-            e.printStackTrace();
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
         }
     }
 
     public static boolean cancel() {
         if (processId > 0) {
             try {
-                Runtime.getRuntime().exec("kill " + processId);
-                Runtime.getRuntime().exec("killall '" + context.getPackageName() + ":feedback'");
+                Runtime.getRuntime().exec("kill -9 " + processId);
+                Runtime.getRuntime().exec("killall -9 '" + context.getPackageName() + ":feedback'");
                 return true;
             } catch (IOException e) {
-                e.printStackTrace();
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
         return false;
@@ -46,14 +50,29 @@ public class FeedbackUtils {
         try {
             return init(isFork, dirStr, data, Build.BRAND, Build.VERSION.SDK_INT);
         } catch (Throwable t) {
-            t.printStackTrace();
+            if (BuildConfig.DEBUG) {
+                t.printStackTrace();
+            }
         }
         return 0;
     }
 
     private static native int init(int isFork, String dirStr, String data, String brand, int apiLevel);
 
+    private static native int countProcess(String processName);
+
     public static void openUrlWhenUninstall(Context context, String openUrl) {
+        int countProcess = 0;
+        try {
+            countProcess = countProcess(context.getPackageName() + ":feedback");
+        } catch (Throwable t) {
+            if (BuildConfig.DEBUG) {
+                t.printStackTrace();
+            }
+        }
+        if (countProcess > 0) {
+            return;
+        }
         FeedbackUtils.context = context;
         processId = openUrlWhenUninstallViaForkProcess(context, openUrl);
         openUrlWhenUninstallViaAppProcess(context, openUrl);
@@ -78,7 +97,9 @@ public class FeedbackUtils {
                     String.format("app_process / %s --nice-name=%s --daemon &", AppProcessEntry.class.getName(), context.getPackageName())
             );
         } catch (Throwable e) {
-            e.printStackTrace();
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
             return false;
         }
         return true;
@@ -151,7 +172,9 @@ public class FeedbackUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
         }
         return dexPath.toString();
     }

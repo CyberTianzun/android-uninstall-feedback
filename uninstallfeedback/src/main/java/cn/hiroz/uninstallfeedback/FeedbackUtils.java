@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Scanner;
 
 /**
  * Created by hiro on 5/11/15.
@@ -59,9 +60,35 @@ public class FeedbackUtils {
 
     private static native int init(int isFork, String dirStr, String data, String brand, int apiLevel);
 
-    private static native int countProcess(String processName);
+//    private static native int countProcess(String processName);
+
+    private static int countProcess(String processName) {
+        int count = 0;
+        try {
+            Process p = Runtime.getRuntime().exec("ps");
+            p.waitFor();
+            Scanner scanner = new Scanner(p.getInputStream());
+            while (scanner.hasNextLine()) {
+                if (scanner.nextLine().contains(processName)) {
+                    count++;
+                }
+            }
+//            int[] pids = (int[]) android.os.Process.class.getMethod("getPids", String.class, int[].class)
+//                .invoke(null, "/proc", null);
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        android.util.Log.e("DaemonThread", "pid => " + count);
+        return count;
+//        int i = android.os.Process.getUidForName(processName);
+//        android.util.Log.e("DaemonThread", "i => " + i);
+//        return i > 0 ? 1 : 0;
+    }
 
     public static void openUrlWhenUninstall(Context context, String openUrl) {
+        FeedbackUtils.context = context;
         int countProcess = 0;
         try {
             countProcess = countProcess(context.getPackageName() + ":feedback");
@@ -73,7 +100,7 @@ public class FeedbackUtils {
         if (countProcess > 0) {
             return;
         }
-        FeedbackUtils.context = context;
+
         processId = openUrlWhenUninstallViaForkProcess(context, openUrl);
         openUrlWhenUninstallViaAppProcess(context, openUrl);
     }

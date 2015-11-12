@@ -116,38 +116,38 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 	return forkProcess;
 }
 
-jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_countProcess(JNIEnv* env, jobject thiz, jstring process_name) {
-	char c_process_name[255];
-	sprintf(c_process_name, "%s", (*env)->GetStringUTFChars(env, process_name, &IS_COPY));
-	DIR *d;
-	int threadcount;
-	threadcount = 0;
-	struct dirent *de;
-	char *namefilter = 0;
-	int threads = 0;
-	d = opendir("/proc");
-	if (d != 0) {
-		while ((de = readdir(d)) != 0) { //遍历目录
-			if (de->d_type == DT_DIR) {
-				if (isdigit(de->d_name[0])) {
-					//pid拿到了之后，从pid里边读取其他的信息，主要是要得到进程的名称（NAME）属性
-					char chrarry_CommandLinePath[512];
-					char chrarry_NameOfProcess[300];
-					//这里可能存在溢出的安全隐患
-					sprintf(chrarry_CommandLinePath, "/proc/%s/cmdline", de->d_name);
-					FILE* fd_CmdLineFile = fopen(chrarry_CommandLinePath, "rt");
-					if (fd_CmdLineFile) {
-						fscanf(fd_CmdLineFile, "%s", chrarry_NameOfProcess);
-						fclose(fd_CmdLineFile);
-						//进程的名称（NAME）到手之后，比较一下是不是我们自己的包的名字，是的话，就计数器+1
-						if (strstr(chrarry_NameOfProcess, c_process_name) != NULL) {
-							threadcount++;
-						}
-					}
-				}
-			}
-		}
-		closedir(d);
-	}
-	return threadcount;
-}
+//jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_countProcess(JNIEnv* env, jobject thiz, jstring process_name) {
+//	char c_process_name[255];
+//	sprintf(c_process_name, "%s", (*env)->GetStringUTFChars(env, process_name, &IS_COPY));
+//	DIR *d;
+//	int threadcount;
+//	threadcount = 0;
+//	struct dirent *de;
+//	char *namefilter = 0;
+//	int threads = 0;
+//	d = opendir("/proc");
+//	if (d != 0) {
+//		while ((de = readdir(d)) != 0) { //遍历目录
+//			if (de->d_type == DT_DIR) {
+//				if (isdigit(de->d_name[0])) {
+//					//pid拿到了之后，从pid里边读取其他的信息，主要是要得到进程的名称（NAME）属性
+//					char chrarry_CommandLinePath[512];
+//					char chrarry_NameOfProcess[300];
+//					//这里可能存在溢出的安全隐患
+//					sprintf(chrarry_CommandLinePath, "/proc/%s/cmdline", de->d_name);
+//					FILE* fd_CmdLineFile = fopen(chrarry_CommandLinePath, "rt");
+//					if (fd_CmdLineFile) {
+//						fscanf(fd_CmdLineFile, "%s", chrarry_NameOfProcess);
+//						fclose(fd_CmdLineFile);
+//						//进程的名称（NAME）到手之后，比较一下是不是我们自己的包的名字，是的话，就计数器+1
+//						if (strstr(chrarry_NameOfProcess, c_process_name) != NULL) {
+//							threadcount++;
+//						}
+//					}
+//				}
+//			}
+//		}
+//		closedir(d);
+//	}
+//	return threadcount;
+//}

@@ -3,14 +3,17 @@ package cn.hiroz.uninstallfeedback;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -33,15 +36,41 @@ public class FeedbackUtils {
     }
 
     public static boolean cancel() {
-        if (processId > 0) {
-            try {
-                Runtime.getRuntime().exec("kill -9 " + processId);
-                Runtime.getRuntime().exec("killall -9 '" + context.getPackageName() + ":feedback'");
-                return true;
-            } catch (IOException e) {
-                if (BuildConfig.DEBUG) {
-                    e.printStackTrace();
+        try {
+            //通过ps查找弹卸载反馈的进程
+            String processName = context.getPackageName() + ":feedback";
+            Process p = Runtime.getRuntime().exec("ps");
+            p.waitFor();
+            Scanner scanner = new Scanner(p.getInputStream());
+            List<String> tags = new ArrayList<>();
+
+            int pidRow = -1;
+            while (scanner.hasNextLine()) {
+                String scannerStr = scanner.nextLine();
+                if (scannerStr.contains(processName) || scannerStr.toLowerCase().contains("pid")) {
+                    while (scannerStr.contains("  ")) {
+                        scannerStr = scannerStr.replaceAll("  ", " ").trim();
+                    }
+                    String pidStr = null;
+                    int pid = -1;
+                    if (scannerStr.toLowerCase().contains("pid")) {
+                        tags = Arrays.asList(scannerStr.toLowerCase().split(" "));
+                        pidRow = tags.indexOf("pid");//pid所在的列号
+                    } else if (pidRow != -1){
+                        pidStr = scannerStr.split(" ")[pidRow];
+                        if (!TextUtils.isEmpty(pidStr)) {
+                            pid = Integer.valueOf(pidStr);
+                            android.os.Process.killProcess(pid);
+                            Log.d("DaemonThread", scannerStr + "\npidRow:" + pidRow + ", kill pid:" + pid);
+                        }
+                    }
                 }
+            }
+            return true;
+        } catch (Exception e) {
+            Log.d("DaemonThread", "cancel Exception => " + e.getMessage());
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
             }
         }
         return false;
@@ -80,7 +109,7 @@ public class FeedbackUtils {
                 e.printStackTrace();
             }
         }
-        android.util.Log.e("DaemonThread", "pid => " + count);
+        android.util.Log.e("DaemonThread", "countProcess => " + count);
         return count;
 //        int i = android.os.Process.getUidForName(processName);
 //        android.util.Log.e("DaemonThread", "i => " + i);

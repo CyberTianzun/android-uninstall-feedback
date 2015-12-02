@@ -76,9 +76,9 @@ public class FeedbackUtils {
         return false;
     }
 
-    private static int wrapInit(int isFork, String dirStr, String data) {
+    private static int wrapInit(int isFork, String dirStr, String data, String processName) {
         try {
-            return init(isFork, dirStr, data, Build.BRAND, Build.VERSION.SDK_INT);
+            return init(isFork, dirStr, data, Build.BRAND, Build.VERSION.SDK_INT, processName);
         } catch (Throwable t) {
             if (BuildConfig.DEBUG) {
                 t.printStackTrace();
@@ -87,7 +87,7 @@ public class FeedbackUtils {
         return 0;
     }
 
-    private static native int init(int isFork, String dirStr, String data, String brand, int apiLevel);
+    private static native int init(int isFork, String dirStr, String data, String brand, int apiLevel, String processName);
 
 //    private static native int countProcess(String processName);
 
@@ -135,7 +135,7 @@ public class FeedbackUtils {
     }
 
     public static int openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {
-        return asyncOpenUrlWhenUninstall(context.getApplicationInfo().dataDir, openUrl);
+        return asyncOpenUrlWhenUninstall(context.getApplicationInfo().dataDir, openUrl, context.getPackageName() + ":feedback");
     }
 
     public static boolean openUrlWhenUninstallViaAppProcess(Context context, String openUrl) {
@@ -161,12 +161,12 @@ public class FeedbackUtils {
         return true;
     }
 
-    static int syncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        return wrapInit(0, dirStr, openUrl);
+    static int syncOpenUrlWhenUninstall(String dirStr, String openUrl, String processName) {
+        return wrapInit(0, dirStr, openUrl, processName);
     }
 
-    static int asyncOpenUrlWhenUninstall(String dirStr, String openUrl) {
-        return wrapInit(1, dirStr, openUrl);
+    static int asyncOpenUrlWhenUninstall(String dirStr, String openUrl, String processName) {
+        return wrapInit(1, dirStr, openUrl, processName);
     }
 
     static int exec(String shell, String... cmds) {

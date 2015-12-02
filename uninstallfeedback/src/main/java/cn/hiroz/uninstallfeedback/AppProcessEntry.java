@@ -26,12 +26,12 @@ public class AppProcessEntry {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FeedbackUtils.syncOpenUrlWhenUninstall(dataDir, feedBackUrl);
+                FeedbackUtils.syncOpenUrlWhenUninstall(dataDir, feedBackUrl, packageName + ":feedback");
             }
         }).start();
     }
 
-    private static void setProcessName(String name) {
+    public static void setProcessName(String name) {
         try {
             Class<android.os.Process> clazz = android.os.Process.class;
             Method method = clazz.getMethod("setArgV0", String.class);

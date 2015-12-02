@@ -11,9 +11,33 @@
 /* 内全局变量begin */
 static jboolean IS_COPY = JNI_TRUE;
 
-jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring data, jstring brand, jint api_level) {
+jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thiz, jint is_fork, jstring dirStr, jstring data, jstring brand, jint api_level, jstring process_name) {
 	int forkProcess = 0;
 	if (is_fork == 0 || 0 == (forkProcess = fork())) {
+
+		if (is_fork == 1) {
+
+			int success = 1;
+			jint sdkInt = 0;
+			jclass class_id = (*env)->FindClass(env, "cn/hiroz/uninstallfeedback/AppProcessEntry");
+			if (class_id == NULL) {
+				success = 0;
+			}
+
+			jmethodID method_id;
+			if (success == 1) {
+				method_id = (*env)->GetStaticMethodID(env, class_id, "setProcessName", "(Ljava/lang/String;)V");
+				if (method_id == NULL) {
+					success = 0;
+				}
+			}
+
+			if (success == 1) {
+				(*env)->CallStaticVoidMethod(env, class_id, method_id, process_name);
+			}
+
+		}
+
 		const char* dir_chars = (*env)->GetStringUTFChars(env, dirStr, &IS_COPY);
 
 		const char* brand_chars = (*env)->GetStringUTFChars(env, brand, &IS_COPY);

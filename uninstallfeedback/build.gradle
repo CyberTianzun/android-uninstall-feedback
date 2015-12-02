@@ -16,7 +16,7 @@ android {
         ndk {
             moduleName "uninstall-feedback"
             ldLibs "log", "z", "m"
-            abiFilters "armeabi", "armeabi-v7a", "x86"
+            abiFilters "armeabi", "x86"
         }
     }
     buildTypes {

@@ -131,7 +131,7 @@ public class FeedbackUtils {
         }
 
         processId = openUrlWhenUninstallViaForkProcess(context, openUrl);
-        openUrlWhenUninstallViaAppProcess(context, openUrl);
+//        openUrlWhenUninstallViaAppProcess(context, openUrl);
     }
 
     public static int openUrlWhenUninstallViaForkProcess(Context context, String openUrl) {
@@ -150,7 +150,7 @@ public class FeedbackUtils {
                     String.format("export %s=%s", "DATA_DIR", dirStr),
                     String.format("export %s=%s", "PACKAGE_NAME", context.getPackageName()),
                     String.format("export %s=%s", "LD_LIBRARY_PATH", System.getenv("LD_LIBRARY_PATH") + ":" + dirStr + "/lib"),
-                    String.format("app_process / %s --nice-name=%s --daemon &", AppProcessEntry.class.getName(), context.getPackageName())
+                    String.format("app_process / %s --nice-name=%s --daemon &", AppProcessEntry.class.getName(), context.getPackageName() + ":feedback")
             );
         } catch (Throwable e) {
             if (BuildConfig.DEBUG) {

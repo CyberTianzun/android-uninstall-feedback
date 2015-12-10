@@ -37,6 +37,9 @@ public class FeedbackUtils {
 
     public static boolean cancel() {
         try {
+            if (processId != 0) {
+                android.os.Process.killProcess(processId);
+            }
             //通过ps查找弹卸载反馈的进程
             String processName = context.getPackageName() + ":feedback";
             Process p = Runtime.getRuntime().exec("ps");

@@ -74,11 +74,11 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 				exit(1);
 			}
 
-			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Start Observer");
+//			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Start Observer");
 
 			size_t readBytes = read(fileDescriptor, p_buf, sizeof(struct inotify_event));
 
-			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Delete");
+//			__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "Delete");
 
 			free(p_buf);
 
@@ -112,10 +112,10 @@ jint Java_cn_hiroz_uninstallfeedback_FeedbackUtils_init(JNIEnv* env, jobject thi
 			// 两秒后再判断目录是否存在，如果还存在，有可能是覆盖安装
 			if (!access(dir_chars, 0)) {
 				// 覆盖安装什么都不用做，重新监听目录删除
-				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "replace install");
+//				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "replace install");
 			} else {
 				// 不是覆盖安装，应该是真被删除了
-				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "will be startup intent");
+//				__android_log_write(ANDROID_LOG_DEBUG, "DaemonThread", "will be startup intent");
 				break;
 			}
 

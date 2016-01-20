@@ -12,7 +12,7 @@ Take from maven repository (<http://search.maven.org/#search%7Cga%7C1%7Ccn.hiroz
 Add it as dependency in Gradle as:
 
 ```
-compile 'cn.hiroz:uninstallfeedback-lib:1.2.2@aar'
+compile 'cn.hiroz:uninstallfeedback-lib:1.2.5@aar'
 ```
 
 ## ProGuard
